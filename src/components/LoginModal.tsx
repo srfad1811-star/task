@@ -9,8 +9,15 @@ interface LoginModalProps {
 async function parseJsonSafely(res: Response): Promise<Record<string, any>> {
   const text = await res.text();
   try {
-    return text ? (JSON.parse(text) as Record<string, any>) : {};
-  } catch {
+    const parsed = text ? (JSON.parse(text) as Record<string, any>) : null;
+    if (!res.ok && (!parsed || typeof parsed.error !== 'string')) {
+      throw new Error(`Server error (${res.status}): ${res.statusText || 'API unavailable'}`);
+    }
+    return parsed ?? {};
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('Server error (')) {
+      throw err;
+    }
     const snippet = text.replace(/\s+/g, ' ').trim().slice(0, 140);
     throw new Error(
       res.ok
@@ -44,7 +51,7 @@ export function LoginModal({ onLoginSuccess }: LoginModalProps) {
       });
       const data = await parseJsonSafely(res);
       if (!res.ok) {
-        throw new Error(String(data.error || 'Invalid access code.'));
+        throw new Error(String(data.error || `Request failed (${res.status})`));
       }
       onLoginSuccess({
         ...(data.user as OperatorSession),
