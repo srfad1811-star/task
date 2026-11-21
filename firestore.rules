@@ -1,0 +1,112 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 4.1: Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global hardened helper primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrapAdmin() {
+      return isVerifiedUser() && request.auth.token.email == 'arhamshoukat4434@gmail.com';
+    }
+
+    function isAdmin() {
+      return isBootstrapAdmin()
+        || (isVerifiedUser() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    // Validation blueprint for Channel (matches firebase-blueprint.json verbatim)
+    function isValidChannel(data) {
+      return data.keys().hasAll(['channelName', 'category', 'visibility', 'createdByUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['channelName', 'channelId', 'category', 'notes', 'visibility', 'createdByUid', 'createdAt', 'updatedAt'])
+        && data.channelName is string && data.channelName.size() >= 1 && data.channelName.size() <= 120
+        && data.category is string && data.category.size() >= 1 && data.category.size() <= 48
+        && (!('channelId' in data) || (data.channelId is string && data.channelId.size() <= 64 && data.channelId.matches('^[a-zA-Z0-9_\\-\\s]*$')))
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 500))
+        && data.visibility is string && data.visibility == 'public'
+        && isValidId(data.createdByUid)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Validation blueprint for AdminUser
+    function isValidAdminUser(data) {
+      return data.keys().hasAll(['role', 'grantedByUid', 'createdAt'])
+        && data.keys().hasOnly(['role', 'grantedByUid', 'createdAt'])
+        && data.role is string && data.role == 'admin'
+        && isValidId(data.grantedByUid)
+        && data.createdAt is timestamp;
+    }
+
+    // Shared permanent TV Channel catalog (non-PII, synced across all laptops and mobiles)
+    match /channels/{channelKey} {
+      allow get: if isValidId(channelKey) && ((resource == null && isVerifiedUser()) || (resource != null && (existing().visibility == 'public' || isAdmin())));
+      allow list: if existing().visibility == 'public';
+
+      allow create: if isVerifiedUser()
+        && isValidId(channelKey)
+        && isValidChannel(incoming())
+        && incoming().createdByUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isVerifiedUser()
+        && isValidId(channelKey)
+        && isValidChannel(incoming())
+        && incoming().createdByUid == existing().createdByUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['channelName', 'channelId', 'category', 'notes', 'updatedAt']))
+          || (existing().createdByUid == request.auth.uid && incoming().diff(existing()).affectedKeys().hasOnly(['channelName', 'channelId', 'category', 'notes', 'updatedAt']))
+        );
+
+      allow delete: if isVerifiedUser()
+        && isValidId(channelKey)
+        && (existing().createdByUid == request.auth.uid || isAdmin());
+    }
+
+    // Trusted Admin Registry (no PII)
+    match /admins/{uid} {
+      allow get: if isVerifiedUser() && isValidId(uid) && (request.auth.uid == uid || isBootstrapAdmin());
+      allow list: if false;
+
+      allow create: if isBootstrapAdmin()
+        && isValidId(uid)
+        && isValidAdminUser(incoming())
+        && incoming().grantedByUid == request.auth.uid
+        && incoming().createdAt == request.time;
+
+      allow update: if isBootstrapAdmin()
+        && isValidId(uid)
+        && isValidAdminUser(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().grantedByUid == existing().grantedByUid
+        && incoming().diff(existing()).affectedKeys().hasOnly(['role']);
+
+      allow delete: if isBootstrapAdmin() && isValidId(uid);
+    }
+  }
+}

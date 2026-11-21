@@ -1,0 +1,211 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root, .dark {
+    --font-display: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', ui-monospace, SFMono-Regular, monospace;
+
+    /* Crisp Red & White Broadcast Theme Tokens */
+    --studio-canvas: #f8f9fa;
+    --studio-rail: #ffffff;
+    --studio-surface: #ffffff;
+    --studio-surface-elevated: #ffffff;
+    --studio-subtle: #f9fafb;
+    --studio-border: #e5e7eb;
+    --studio-border-strong: #dc2626;
+    --studio-border-focus: #dc2626;
+
+    --studio-ink: #111827;
+    --studio-ink-secondary: #4b5563;
+    --studio-ink-muted: #6b7280;
+
+    --studio-signal: #dc2626;
+    --studio-signal-hover: #b91c1c;
+    --studio-amber: #d97706;
+    --studio-emerald: #059669;
+    --studio-blue: #2563eb;
+    --studio-cyan: #0891b2;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--studio-canvas);
+    color: var(--studio-ink);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible {
+    outline: 2px solid #dc2626;
+    outline-offset: 2px;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* -------------------------------------------------------------------------- */
+/* RED & WHITE BROADCAST THEME MAPPINGS & COMPONENT HARMONY                  */
+/* Pure crisp white cards, clean red accents, dark graphite typography        */
+/* -------------------------------------------------------------------------- */
+
+/* Cards & Surface backgrounds */
+.bg-white,
+[class*="bg-[#ffffff]"],
+[class*="bg-[#0b0f19]"],
+[class*="bg-[#0B0C10]"],
+[class*="bg-[#181B26]"],
+[class*="bg-[#1B1B1A]"],
+[class*="bg-[#111115]"] {
+  background-color: #ffffff !important;
+  color: #111827;
+}
+
+/* Secondary / Sub-panel backgrounds */
+[class*="bg-[#F8F7F4]"],
+[class*="bg-[#FCFBF9]"],
+[class*="bg-[#F4F2ED]"],
+[class*="bg-[#F2F0EB]"],
+[class*="bg-[#F3EFE6]"],
+[class*="bg-[#EFECE3]"],
+[class*="bg-[#162032]"],
+[class*="bg-[#192438]"],
+[class*="bg-[#0e1422]"],
+[class*="bg-[#0d1527]"] {
+  background-color: #f9fafb !important;
+  color: #374151;
+}
+
+/* Clean Cool Grey Hairline Borders */
+[class*="border-[#1e293b]"],
+[class*="border-[#2D3246]"],
+[class*="border-[#334155]"],
+[class*="border-[#26354d]"],
+[class*="border-[#E5E2DC]"],
+[class*="border-[#D4CFC5]"],
+[class*="border-[#DDD8CE]"],
+[class*="border-[#EFECE6]"],
+[class*="border-[#DCD6CD]"],
+[class*="border-[#2C2C2A]"],
+[class*="border-[#3A3A37]"],
+[class*="border-[#2A2A27]"],
+[class*="border-[#343432]"] {
+  border-color: #e5e7eb !important;
+}
+
+/* Primary Headings & Bold Text */
+[class*="text-[#f8fafc]"],
+[class*="text-[#F8FAFC]"],
+[class*="text-[#141413]"],
+[class*="text-[#111110]"],
+[class*="text-[#1C1B1A]"],
+[class*="text-[#050505]"] {
+  color: #111827 !important;
+}
+
+/* Secondary / Muted Text */
+[class*="text-[#94a3b8]"],
+[class*="text-[#64748b]"],
+[class*="text-[#cbd5e1]"],
+[class*="text-[#57534E]"],
+[class*="text-[#78716C]"],
+[class*="text-[#8A847C]"],
+[class*="text-[#524E49]"],
+[class*="text-[#827B72]"] {
+  color: #4b5563 !important;
+}
+
+/* Inputs, Selects, and Textareas */
+input[type="text"],
+input[type="search"],
+input[type="date"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+  border-radius: 4px;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #dc2626 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Tables: Crisp White with Red Accent Hover */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table thead {
+  background-color: #f9fafb !important;
+}
+
+table th {
+  color: #4b5563 !important;
+  font-family: var(--font-mono);
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+table tbody tr {
+  border-color: #f3f4f6 !important;
+  transition: background-color 0.15s ease;
+}
+
+table tbody tr:hover {
+  background-color: #fef2f2 !important; /* light red tint */
+}
+
+/* Clean Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "BroadcastQA Studio — TV Channel Autosave Analyzer",
+  "description": "Enterprise TV channel autosave XML analyzer, timeline viewer, rule-based QA monitoring engine, and Excel report exporter backed by SQLite.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

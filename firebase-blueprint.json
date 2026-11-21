@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "Channel": {
+      "title": "TV Channel",
+      "description": "Permanently stored TV channel in the shared broadcast monitoring catalog synced across all laptops and mobile devices.",
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "type": "string",
+          "description": "Optional channel ID matching office autosave XML files.",
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-\\s]*$"
+        },
+        "channelName": {
+          "type": "string",
+          "description": "Display name of the TV channel.",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "category": {
+          "type": "string",
+          "description": "Broadcast category of the channel.",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional operational monitoring notes.",
+          "maxLength": 500
+        },
+        "visibility": {
+          "type": "string",
+          "description": "Visibility scope of the channel catalog entry.",
+          "enum": ["public"]
+        },
+        "createdByUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the user who created the channel.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the channel was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the channel was last updated."
+        }
+      },
+      "required": [
+        "channelName",
+        "category",
+        "visibility",
+        "createdByUid",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdminUser": {
+      "title": "Admin Registry Entry",
+      "description": "Authoritative registry of administrators who can manage any channel in the shared broadcast catalog.",
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "Assigned administrative role.",
+          "enum": ["admin"]
+        },
+        "grantedByUid": {
+          "type": "string",
+          "description": "UID of the bootstrap administrator who granted access.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when admin access was granted."
+        }
+      },
+      "required": ["role", "grantedByUid", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/channels/{channelKey}": {
+      "schema": { "$ref": "#/entities/Channel" },
+      "description": "Shared permanent catalog of TV channels synchronized across all devices."
+    },
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Trusted administrator lookup registry (no PII stored)."
+    }
+  }
+}

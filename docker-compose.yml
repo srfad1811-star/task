@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    container_name: broadcastqa-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DISABLE_EMBEDDED_WORKER=true
+    volumes:
+      - broadcast_data:/app/data
+
+  recording-worker:
+    build: .
+    container_name: broadcastqa-worker
+    restart: unless-stopped
+    command: ["npx", "tsx", "worker.ts"]
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - RECORDING_WORKER_ID=cloud-worker-01
+    volumes:
+      - broadcast_data:/app/data
+
+volumes:
+  broadcast_data:
